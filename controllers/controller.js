@@ -29,7 +29,12 @@ function show(req, res) {
     if (err) return res.status(500).json({ error: 'Database query failed'});
     if (results.length === 0) return res.status(404).json({ error: 'Post not found'});
     res.json(results[0])
+    console.log(results);
   })
+
+  
+  
+    
 }
 
 
@@ -87,7 +92,7 @@ const destroy = (req, res) => {
   //1. take the resource id from the request
   const id = req.params.id
 
-  //2. prepare the sql query to delete the record form the db
+
   const sql = 'DELETE FROM posts WHERE id=?'
 
   
