@@ -1,4 +1,5 @@
 const employees = require('../data/data.js')
+const connection = require('../data/connection.js')
 const fs = require('fs')
 const index = (req, res) => {
   res.json({
