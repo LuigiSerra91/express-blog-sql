@@ -1,18 +1,30 @@
 const employees = require('../data/data.js')
 const connection = require('../data/connection.js')
-const fs = require('fs')
-function index(req,res) {
-  const sql = 'SELECT * FROM posts';
+const fs = require('fs');
+
+
+const index = (req, res) => {
+
+  
+  const sql = 'SELECT * FROM posts'
+  
   connection.query(sql, (err, results) => {
-    if (err) return res.status(500).json({ error: 'Database query failed'});
-    res.json(results)
+    if (err) return res.status(500).json({ error: err });
+
+    const responseData = {
+      data: results,
+      counter: results.length
+    }
+
+    res.status(200).json(responseData);
   })
 }
-
 function show(req, res) {
   const id = req.params.id
+  console.log(id);
+  
 
-  const sql = 'SELECT * FROM posts WHERE id= ?';
+  const sql = 'SELECT * FROM posts WHERE id=?';
   connection.query(sql, [id], (err, results) =>{
     if (err) return res.status(500).json({ error: 'Database query failed'});
     if (results.length === 0) return res.status(404).json({ error: 'Post not found'});
@@ -66,30 +78,29 @@ const update = (req, res) => {
 
 }
 
+
 const destroy = (req, res) => {
-  // find the post by id
-  const employe = employees.find(employe => employe.id === parseInt(req.params.id));
 
-  // check if the user is deleting the correct post
-  if (!employe) {
-    return res.status(404).json({ error: "No post found whit this id" })
-  }
+  console.log(req.params);
 
-  // remove the post from the menu
-  const newemploye = employees.filter((employees) => employees.id !== parseInt(req.params.id));
 
-  // update the js file
-  fs.writeFileSync('./data/data.js', `module.exports = ${JSON.stringify(newemploye, null, 4)}`)
+  //1. take the resource id from the request
+  const id = req.params.id
 
-  // return the updated menu item
-  res.status(200).json({
-    status: 200,
-    data: newemploye,
-    counter: newemploye.length
+  //2. prepare the sql query to delete the record form the db
+  const sql = 'DELETE FROM posts WHERE id=?'
+
+  
+  connection.query(sql, [id], (err, results) => {
+    console.log(err, results);
+    if (err) return res.status(500).json({ error: err })
+    
+    if (results.affectedRows === 0) return res.status(404).json({ error: `404! No post found with the this id: ${id}` })
+
+    return res.json({ status: 204, affectedRows: results.affectedRows })
+
   })
-
 }
-
 module.exports = {
   index,
   store,
