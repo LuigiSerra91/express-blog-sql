@@ -9,21 +9,16 @@ function index(req,res) {
   })
 }
 
-const show = ('/post/:id', (req, res) => {
-  const employe = employees.find(employe => employe.id === Number(req.params.id))
-  console.log(employe);
+function show(req, res) {
+  const id = req.params.id
 
-
-  if (!employe) {
-    return res.status(404).json({
-      error: '404! not found'
-    })
-  }
-  return res.status(200).json({
-    status: 200,
-    data: employe
+  const sql = 'SELECT * FROM posts WHERE id= ?';
+  connection.query(sql, [id], (err, results) =>{
+    if (err) return res.status(500).json({ error: 'Database query failed'});
+    if (results.length === 0) return res.status(404).json({ error: 'Post not found'});
+    res.json(results[0])
   })
-})
+}
 
 
 const store = (req, res) => {
